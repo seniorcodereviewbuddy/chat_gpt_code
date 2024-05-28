@@ -1,4 +1,4 @@
-@echo on
+@echo off
 
 rem When running the python file, if the files has *_test.py we
 REM treat it as a test file and run it with pytest. Otherwise
