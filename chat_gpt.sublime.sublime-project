@@ -20,9 +20,6 @@
 			"name": "Conda Python",
 			"selector": "source.python",
 			"windows": {
-				"env": {
-					"PYTHON_DIR": "C:\\Users\\chris\\miniconda3\\envs\\podcast\\"
-				},
 				"cmd": ["$project_path\\run_python.bat", "$file"],
 			}
 		}
