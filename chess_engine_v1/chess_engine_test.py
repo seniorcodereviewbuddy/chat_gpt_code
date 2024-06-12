@@ -110,7 +110,7 @@ class TestChessEngine(unittest.TestCase):
         self.board.make_move(move)
         self.assertEqual(self.board.board[6][0], '.')
         self.assertEqual(self.board.board[4][0], 'P')
-        self.board.undo_move(move)
+        self.board.undo_move(move, '.')
         self.assertEqual(self.board.board[6][0], 'P')
         self.assertEqual(self.board.board[4][0], '.')
 
@@ -122,11 +122,13 @@ class TestChessEngine(unittest.TestCase):
         self.board.board[4][4] = 'Q'  # Add a white queen in the center
         self.assertEqual(self.board.evaluate(), 9)
 
-    def test_minimax(self):
-        # Test the minimax function
+    def test_alpha_beta(self):
+        # Test the alpha_beta function
         # This is a basic test to ensure the function runs without error and returns a value
-        score = self.engine.minimax(1, True)
+        score, move = self.engine.alpha_beta(2, -float('inf'), float('inf'), True)
         self.assertIsInstance(score, (int, float))
+        self.assertIsInstance(move, tuple)
+
 
     def test_best_move(self):
         # Test the best move function

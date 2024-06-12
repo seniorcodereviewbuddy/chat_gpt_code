@@ -140,11 +140,11 @@ class Board:
         self.board[start[0]][start[1]] = '.'
         self.board[end[0]][end[1]] = piece
 
-    def undo_move(self, move):
+    def undo_move(self, move, captured_piece):
         # Undo a move on the board
         (start, end) = move
         piece = self.board[end[0]][end[1]]
-        self.board[end[0]][end[1]] = '.'
+        self.board[end[0]][end[1]] = captured_piece
         self.board[start[0]][start[1]] = piece
 
     def evaluate(self):
@@ -164,40 +164,44 @@ class ChessEngine:
     def __init__(self, board):
         self.board = board
 
-    def minimax(self, depth, is_maximizing):
-        # Minimax algorithm with fixed depth
+    def alpha_beta(self, depth, alpha, beta, is_maximizing):
         if depth == 0:
-            return self.board.evaluate()
+            return self.board.evaluate(), None
 
-        moves = self.board.generate_moves()
+        legal_moves = self.board.generate_moves()
         if is_maximizing:
-            max_eval = float('-inf')
-            for move in moves:
+            max_eval = -float('inf')
+            best_move = None
+            for move in legal_moves:
+                captured_piece = self.board.board[move[1][0]][move[1][1]]
                 self.board.make_move(move)
-                eval = self.minimax(depth - 1, False)
-                self.board.undo_move(move)
-                max_eval = max(max_eval, eval)
-            return max_eval
+                eval, _ = self.alpha_beta(depth - 1, alpha, beta, False)
+                self.board.undo_move(move, captured_piece)
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return max_eval, best_move
         else:
             min_eval = float('inf')
-            for move in moves:
+            best_move = None
+            for move in legal_moves:
+                captured_piece = self.board.board[move[1][0]][move[1][1]]
                 self.board.make_move(move)
-                eval = self.minimax(depth - 1, True)
-                self.board.undo_move(move)
-                min_eval = min(min_eval, eval)
-            return min_eval
+                eval, _ = self.alpha_beta(depth - 1, alpha, beta, True)
+                self.board.undo_move(move, captured_piece)
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return min_eval, best_move
 
     def best_move(self, depth):
-        # Determine the best move by evaluating all possible moves
-        best_move = None
-        best_value = float('-inf')
-        for move in self.board.generate_moves():
-            self.board.make_move(move)
-            board_value = self.minimax(depth - 1, False)
-            self.board.undo_move(move)
-            if board_value > best_value:
-                best_value = board_value
-                best_move = move
+        _, best_move = self.alpha_beta(depth, -float('inf'), float('inf'), True)
         return best_move
 
 class UCIInterface:
