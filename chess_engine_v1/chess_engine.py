@@ -24,6 +24,17 @@ class Board:
             print(' '.join(row))
         print()
 
+    # Added by Chris.
+    def square_to_alg(self, square):
+        files = 'abcdefgh'
+        ranks = '12345678'
+        return files[square[1]] + ranks[7 - square[0]]
+
+    def print_legal_moves(self):
+        legal_moves = self.generate_moves()
+        legal_moves_as_algo = [self.square_to_alg(start) + self.square_to_alg(end) for start,end in legal_moves]
+        print("Legal moves:\n" + ' '.join(legal_moves_as_algo))
+
     def generate_moves(self):
         # Generate all legal moves for the current player
         moves = []
@@ -189,20 +200,60 @@ class ChessEngine:
                 best_move = move
         return best_move
 
-def main():
-    # Main function to run the chess engine
-    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    board = Board(fen)
-    engine = ChessEngine(board)
+class UCIInterface:
+    def __init__(self):
+        self.board = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+        self.engine = ChessEngine(self.board)
 
-    while True:
-        board.display()
-        move = engine.best_move(3)
-        if move is None:
-            print("Game over")
-            break
-        board.make_move(move)
-        board.turn = 'b' if board.turn == 'w' else 'w'
+    def uci(self):
+        print("id name SimpleChessEngine")
+        print("id author YourName")
+        print("uciok")
+
+    def isready(self):
+        print("readyok")
+
+    def position(self, fen):
+        self.board = Board(fen)
+        self.engine = ChessEngine(self.board)
+
+    def go(self, depth):
+        best_move = self.engine.best_move(depth)
+        start, end = best_move
+        move_str = self.square_to_alg(start) + self.square_to_alg(end)
+        print(f"bestmove {move_str}")
+
+    def square_to_alg(self, square):
+        files = 'abcdefgh'
+        ranks = '12345678'
+        return files[square[1]] + ranks[7 - square[0]]
+
+    def print_board(self):
+        self.board.display()
+        self.board.print_legal_moves()
+
+    def run(self):
+        while True:
+            try:
+                command = input().strip()
+                if command == "uci":
+                    self.uci()
+                elif command == "isready":
+                    self.isready()
+                elif command.startswith("position fen"):
+                    fen = command.split("position fen ")[1]
+                    self.position(fen)
+                elif command.startswith("go depth"):
+                    depth = int(command.split("go depth ")[1])
+                    self.go(depth)
+                elif command == "d":
+                    self.print_board()
+                elif command == "quit":
+                    break
+            except EOFError:
+                break
+
 
 if __name__ == "__main__":
-    main()
+    uci_interface = UCIInterface()
+    uci_interface.run()
