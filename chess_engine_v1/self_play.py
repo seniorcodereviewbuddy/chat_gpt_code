@@ -31,16 +31,20 @@ class SelfPlay:
         """
         Read the response from a chess engine.
         """
+        # TODO: ChatGPT: Add error handling
+
         response = ""
         while True:
             line = engine.stdout.readline().strip()
             if line:
                 print(f"Received response: {line}")
                 response += line + "\n"
+                # TODO: Update read_response to take in the expected 'end line id'.
                 if line.startswith("bestmove") or line == "uciok" or line == "readyok":
                     break
         return response
 
+    # TODO: Try and merge this with read_response.
     def read_board(self, engine):
         """
         Read the board state from the engine and print it.
@@ -50,16 +54,13 @@ class SelfPlay:
         while True:
             line = engine.stdout.readline().strip()
             if line == "Legal moves:":
+                # Read the next line of the legal moves and ignore them
+                engine.stdout.readline()
                 break
             # Chris: Flush to help debug.
             print(line, flush=True)
 
-
-
-    def play_game(self, max_moves=100):
-        """
-        Play a game between two engines, alternating moves until a move limit is reached or no valid moves are found.
-        """
+    def _setup_engines(self):
         # Start both engines
         engine1 = self.start_engine()
         engine2 = self.start_engine()
@@ -76,7 +77,17 @@ class SelfPlay:
         self.send_command(engine1, starting_fen)
         self.send_command(engine2, starting_fen)
 
-        # Play the game
+        return engine1, engine2
+
+    def _move_from_best_move_response(self, best_move_response):
+        # TODO: Add error handling.
+        # The bestmove response should look like:
+        # bestmove {move} [(optional) ponder {move}]
+        parts = best_move_response.split(" ")
+        return parts[1]
+
+
+    def _play_game(self, engine1, engine2, max_moves):
         current_engine = engine1
         next_engine = engine2
         move_history = []
@@ -85,22 +96,34 @@ class SelfPlay:
             self.send_command(current_engine, "go depth 2")
             response = self.read_response(current_engine)
             if "bestmove" in response:
-                best_move = response.split("bestmove ")[1].split(" ")[0]
+                best_move = self._move_from_best_move_response(response)
                 move_history.append(best_move)
                 print(f"Move {move_count + 1}: {best_move}")
 
+                # TODO: Do we need to send everything from the beginning, or can we just send the moves it's missing?
                 # Send the move to the next engine
                 position_command = f"position startpos moves {' '.join(move_history)}"
                 self.send_command(next_engine, position_command)
 
                 # Print the current board state
-                self.read_board(current_engine)
+                self.read_board(next_engine)
 
                 # Switch engines
                 current_engine, next_engine = next_engine, current_engine
             else:
                 print("No valid move found. Game over.")
                 break
+
+
+    def play_game(self, max_moves=100):
+        """
+        Play a game between two engines, alternating moves until a move limit is reached or no valid moves are found.
+        """
+        # Start both engines
+        engine1, engine2 = self._setup_engines()
+
+        # Play the game
+        self._play_game(engine1, engine2, max_moves)
 
         # Terminate both engines
         engine1.terminate()

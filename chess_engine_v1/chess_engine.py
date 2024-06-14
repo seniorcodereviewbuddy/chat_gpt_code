@@ -58,6 +58,14 @@ class FENRecord:
             board.append(board_row)
         return board
 
+
+def square_to_alg(square):
+    files = 'abcdefgh'
+    ranks = '12345678'
+    # TODO: Chris: Figure out the logic of how ranks is converted.
+    return files[square[1]] + ranks[(BOARD_SIZE - 1) - square[0]]
+
+
 class Board:
     def __init__(self, fen_str):
         # Initialize the board using FEN notation
@@ -71,15 +79,9 @@ class Board:
             print(' '.join(row))
         print()
 
-    # Added by Chris.
-    def square_to_alg(self, square):
-        files = 'abcdefgh'
-        ranks = '12345678'
-        return files[square[1]] + ranks[7 - square[0]]
-
     def print_legal_moves(self):
         legal_moves = self.generate_moves()
-        legal_moves_as_algo = [self.square_to_alg(start) + self.square_to_alg(end) for start,end in legal_moves]
+        legal_moves_as_algo = [square_to_alg(start) + square_to_alg(end) for start,end in legal_moves]
         print("Legal moves:\n" + ' '.join(legal_moves_as_algo))
 
     def _piece_owned_by_current_player(self, piece):
@@ -265,12 +267,12 @@ class ChessEngine:
 
 class UCIInterface:
     def __init__(self):
-        self.board = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+        self.board = None
         self.engine = ChessEngine(self.board)
 
     def uci(self):
         print("id name SimpleChessEngine")
-        print("id author YourName")
+        print("id author SCRB")
         print("uciok")
 
     def isready(self):
@@ -283,13 +285,8 @@ class UCIInterface:
     def go(self, depth):
         best_move = self.engine.best_move(depth)
         start, end = best_move
-        move_str = self.square_to_alg(start) + self.square_to_alg(end)
+        move_str = square_to_alg(start) + square_to_alg(end)
         print(f"bestmove {move_str}")
-
-    def square_to_alg(self, square):
-        files = 'abcdefgh'
-        ranks = '12345678'
-        return files[square[1]] + ranks[7 - square[0]]
 
     def print_board(self):
         self.board.display()
@@ -298,12 +295,20 @@ class UCIInterface:
     def run(self):
         while True:
             try:
+                # TODO: Have this loop just handle routing the commands to the
+                # right functions, and those function then parse the command string
+                # as needed.
                 command = input().strip()
                 if command == "uci":
                     self.uci()
                 elif command == "isready":
                     self.isready()
+                elif command.startswith("position startpos"):
+                    # TODO: ChatGPT: handles moves passed in with this command.
+                    start_pos_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                    self.position(start_pos_fen)
                 elif command.startswith("position fen"):
+                    # TODO: ChatGPT: handles moves passed in with this command.
                     fen = command.split("position fen ")[1]
                     self.position(fen)
                 elif command.startswith("go depth"):
