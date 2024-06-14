@@ -26,5 +26,6 @@ class TestUCIInterface(unittest.TestCase):
 
     # TODO: ChatGPT: Add test for self_play file.
 
+
 if __name__ == "__main__":
     unittest.main()

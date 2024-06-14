@@ -105,13 +105,14 @@ class TestChessEngine(unittest.TestCase):
         self.assertSetEqual(set(moves), set(expected_moves))
 
     # TODO: ChatGPT: Add more test cases here.
+    # Tests should include ensuring undo returns captured pieces correctly.
     def test_make_and_undo_move(self):
         # Test making and undoing a move
         move = ((6, 0), (4, 0))
         self.board.make_move(move)
         self.assertEqual(self.board.board[6][0], '.')
         self.assertEqual(self.board.board[4][0], Pieces.WHITE_PAWN)
-        self.board.undo_move(move)
+        self.board.undo_move(move, '.')
         self.assertEqual(self.board.board[6][0], Pieces.WHITE_PAWN)
         self.assertEqual(self.board.board[4][0], '.')
 
