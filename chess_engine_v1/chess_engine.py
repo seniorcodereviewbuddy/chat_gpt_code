@@ -58,6 +58,14 @@ class FENRecord:
             board.append(board_row)
         return board
 
+
+def square_to_alg(square):
+    files = 'abcdefgh'
+    ranks = '12345678'
+    # TODO: Chris: Figure out the logic of how ranks is converted.
+    return files[square[1]] + ranks[(BOARD_SIZE - 1) - square[0]]
+
+
 class Board:
     def __init__(self, fen_str):
         # Initialize the board using FEN notation
@@ -70,6 +78,11 @@ class Board:
         for row in self.board:
             print(' '.join(row))
         print()
+
+    def print_legal_moves(self):
+        legal_moves = self.generate_moves()
+        legal_moves_as_algo = [square_to_alg(start) + square_to_alg(end) for start,end in legal_moves]
+        print("Legal moves:\n" + ' '.join(legal_moves_as_algo))
 
     def _piece_owned_by_current_player(self, piece):
         return piece.isupper() if self.turn == Player.WHITE else piece.islower()
@@ -252,20 +265,64 @@ class ChessEngine:
                 best_move = move
         return best_move
 
-def main():
-    # Main function to run the chess engine
-    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    board = Board(fen)
-    engine = ChessEngine(board)
+class UCIInterface:
+    def __init__(self):
+        self.board = None
+        self.engine = ChessEngine(self.board)
 
-    while True:
-        board.display()
-        move = engine.best_move(3)
-        if move is None:
-            print("Game over")
-            break
-        board.make_move(move)
-        board.turn = Player.BLACK if board.turn == Player.WHITE else Player.WHITE
+    def uci(self):
+        print("id name SimpleChessEngine")
+        print("id author SCRB")
+        print("uciok")
+
+    def isready(self):
+        print("readyok")
+
+    def position(self, fen):
+        self.board = Board(fen)
+        self.engine = ChessEngine(self.board)
+
+    def go(self, depth):
+        best_move = self.engine.best_move(depth)
+        start, end = best_move
+        move_str = square_to_alg(start) + square_to_alg(end)
+        print(f"bestmove {move_str}")
+
+    def print_board(self):
+        self.board.display()
+        self.board.print_legal_moves()
+
+    def run(self):
+        while True:
+            try:
+                # TODO: Have this loop just handle routing the commands to the
+                # right functions, and those function then parse the command string
+                # as needed.
+                command = input().strip()
+                if command == "uci":
+                    self.uci()
+                elif command == "isready":
+                    self.isready()
+                elif command.startswith("position startpos"):
+                    # TODO: ChatGPT: handles moves passed in with this command.
+                    start_pos_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                    self.position(start_pos_fen)
+                elif command.startswith("position fen"):
+                    # TODO: ChatGPT: handles moves passed in with this command.
+                    fen = command.split("position fen ")[1]
+                    self.position(fen)
+                elif command.startswith("go depth"):
+                    depth = int(command.split("go depth ")[1])
+                    self.go(depth)
+                elif command == "d":
+                    self.print_board()
+                elif command == "quit":
+                    break
+            except EOFError:
+                break
+
 
 if __name__ == "__main__":
-    main()
+    uci_interface = UCIInterface()
+    uci_interface.run()
+
