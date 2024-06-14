@@ -226,24 +226,25 @@ class ChessEngine:
                     score += piece_values[piece]
         return score
 
-class ChessEngine:
-    def __init__(self, board):
-        self.board = board
-
     # TODO: Chris: Come up with an enum for is_maximizing.
+    # TODO: Instead of changing self.board all the time, we should be passing in a new Board for each
+    # call. This way we could easily multithread in the future. And it makes sense that self.board would
+    # always refer to the current state, instead of changing around a bunch.
     def alpha_beta(self, depth, alpha, beta, is_maximizing):
         if depth == 0:
-            return self.board.evaluate(), None
+            return self.evaluate(), None
 
         legal_moves = self.board.generate_moves()
+        # TODO: Look at pulling the common functionality of the two bodies of this if statement into
+        # a common helper function to reduce repeated code.
         if is_maximizing:
             max_eval = -float('inf')
             best_move = None
             for move in legal_moves:
-                captured_piece = self.board.board[move[1][0]][move[1][1]]
+                square_previous_contents = self.board.board[move[1][0]][move[1][1]]
                 self.board.make_move(move)
                 eval, _ = self.alpha_beta(depth - 1, alpha, beta, False)
-                self.board.undo_move(move, captured_piece)
+                self.board.undo_move(move, square_previous_contents)
                 if eval > max_eval:
                     max_eval = eval
                     best_move = move
