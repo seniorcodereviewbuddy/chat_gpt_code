@@ -14,10 +14,16 @@ REM must be 0 and we treat it as a test file and run it with pytest.
 REM See the following stackoverflow page for more details:
 REM https://stackoverflow.com/questions/7005951/batch-file-find-if-substring-is-in-string-not-in-a-file
 
+set python_path=%CHAT_GPT_CONDA_DIR%\python.exe
+IF NOT EXIST %python_path% (
+    echo Unable able to find python exe, looked at %python_path%
+    exit 1
+)
+
 echo:%1| findstr /c:"_test.py" /i /e 1>nul
 
 IF ERRORLEVEL 1 (
-%CHAT_GPT_CONDA_DIR%\python.exe %1
+%python_path% %1
 ) ELSE (
-%CHAT_GPT_CONDA_DIR%\python.exe -m unittest %1
+%python_path% -m unittest %1
 )

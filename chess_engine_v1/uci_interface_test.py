@@ -14,15 +14,18 @@ class TestUCIInterface(unittest.TestCase):
         output = mock_stdout.getvalue().strip().split('\n')
         expected_output = [
             "id name SimpleChessEngine",
-            "id author YourName",
+            "id author SCRB",
             "uciok",
             "readyok",
-            "bestmove e2e3"  # Note: The exact move may vary depending on implementation
+            "bestmove [a-h][1-8][a-h][1-8]"  # Note: The exact move may vary depending on implementation
         ]
 
-        # Check that the UCI responses are as expected
-        self.assertEqual(output[:5], expected_output[:5])
-        #self.assertEqual(output, expected_output)
+        # TODO: look at all output, not just the first 5 lines.
+        for i in range(5):
+                self.assertRegex(output[i], expected_output[i])
+
+    # TODO: ChatGPT: Add test for self_play file.
+
 
 if __name__ == "__main__":
     unittest.main()
