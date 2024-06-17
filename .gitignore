@@ -161,3 +161,6 @@ cython_debug/
 
 # Sublime files to ignore
 chat_gpt.sublime.sublime-workspace
+
+# Backup files to ignore
+*.bak
