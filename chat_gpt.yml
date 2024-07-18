@@ -1,4 +1,4 @@
 name: chat_gpt
 dependencies:
-  - pre_commit==3.7.1
+  - conda-forge::pre_commit==3.7.1
   - python==3.12.3
