@@ -1,6 +1,8 @@
 import unittest
 
-from chess_engine import Board, ChessEngine, Pieces
+from chess_engine import Board, ChessEngine, Pieces, uci_algebraic_notation
+from move import Move
+from square import Squares
 
 # TODO: Chris: Fix all tests.
 
@@ -190,6 +192,28 @@ class TestChessEngine(unittest.TestCase):
         move = self.engine.best_move(1)
         # TODO: Chris: Pretty sure this is wrong, but it's at least constant.
         self.assertEqual(move, ((7, 3), (1, 3)))
+
+
+class TestUCIAlgebraicNotation(unittest.TestCase):
+    def test_uci_algebraic_notation_white(self):
+        move = Move(Squares.E2, Squares.E4, "P")
+        self.assertEqual(uci_algebraic_notation(move), "e2e4")
+
+        move = Move(Squares.E2, Squares.E4, "R")
+        self.assertEqual(uci_algebraic_notation(move), "e2e4")
+
+        move = Move(Squares.E7, Squares.E8, "P", promotion_piece="Q")
+        self.assertEqual(uci_algebraic_notation(move), "e7e8q")
+
+    def test_uci_algebraic_notation_black(self):
+        move = Move(Squares.E7, Squares.E5, "p")
+        self.assertEqual(uci_algebraic_notation(move), "e7e5")
+
+        move = Move(Squares.E7, Squares.E5, "r")
+        self.assertEqual(uci_algebraic_notation(move), "e7e5")
+
+        move = Move(Squares.E2, Squares.E1, "p", promotion_piece="q")
+        self.assertEqual(uci_algebraic_notation(move), "e2e1q")
 
 
 if __name__ == "__main__":
