@@ -1,23 +1,40 @@
+from square import Square
+
+BOARD_SIZE = 8
+
+
+def square_to_alg(square):
+    files = "abcdefgh"
+    ranks = "12345678"
+    # TODO: Chris: Figure out the logic of how ranks is converted.
+    return files[square[1]] + ranks[(BOARD_SIZE - 1) - square[0]]
+
+
 class Move:
     def __init__(
         self,
-        start: tuple[int, int],
-        end: tuple[int, int],
+        start: Square,
+        end: Square,
         piece_moved: str,
-        piece_captured: str = " ",
+        piece_captured: str | None = None,
         promotion_piece: str | None = None,
     ):
-        self.start: tuple[int, int] = start
-        self.end: tuple[int, int] = end
-        self.piece_moved: str = piece_moved
-        self.piece_captured: str = piece_captured
-        self.promotion_piece: str | None = promotion_piece
+        self.start = start
+        self.end = end
+        self.piece_moved = piece_moved
+        self.piece_captured = piece_captured
+        self.promotion_piece = promotion_piece
 
     def __str__(self) -> str:
+        val = f"{self.piece_moved} from {self.start} to {self.end}"
+
+        if self.piece_captured:
+            val += f", capturing {self.piece_captured}"
+
         if self.promotion_piece:
-            return f"{self.piece_moved} from {self.start} to {self.end}, capturing {self.piece_captured}, promoting to {self.promotion_piece}"  # noqa
-        else:
-            return f"{self.piece_moved} from {self.start} to {self.end}, capturing {self.piece_captured}"  # noqa
+            val += f", promoting to {self.promotion_piece}"
+
+        return val
 
     def __repr__(self) -> str:
         return self.__str__()
