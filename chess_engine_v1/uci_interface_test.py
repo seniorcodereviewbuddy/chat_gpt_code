@@ -4,12 +4,23 @@ from unittest.mock import patch
 
 from chess_engine import UCIInterface
 
+STARTING_GAME_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
 
 class TestUCIInterface(unittest.TestCase):
     @patch(
         "sys.stdin",
         StringIO(
-            "uci\nisready\nposition fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\ngo depth 1\nd\nquit\n"  # noqa
+            "\n".join(
+                [
+                    "uci",
+                    "isready",
+                    f"position fen {STARTING_GAME_FEN}",
+                    "go depth 1",
+                    "d",
+                    "quit",
+                ]
+            )
         ),
     )
     @patch("sys.stdout", new_callable=StringIO)
