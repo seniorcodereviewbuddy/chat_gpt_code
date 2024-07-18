@@ -1,5 +1,7 @@
 import enum
 
+from move import Move
+
 
 class Player(enum.Enum):
     WHITE = 1
@@ -315,6 +317,13 @@ class ChessEngine:
         # TODO: ChatGPT: Add stalemate and winner detection.
         _, best_move = self.alpha_beta(depth, -float("inf"), float("inf"), True)
         return best_move
+
+
+def uci_algebraic_notation(move: Move) -> str:
+    val = f"{move.start}{move.end}"
+    if move.promotion_piece:
+        val += move.promotion_piece.lower()
+    return val
 
 
 class UCIInterface:
