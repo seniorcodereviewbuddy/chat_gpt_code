@@ -1,5 +1,5 @@
 import subprocess
-import time
+
 
 class SelfPlay:
     def __init__(self, engine_command):
@@ -16,7 +16,7 @@ class SelfPlay:
             # Chris change for better debugging.
             stderr=subprocess.STDOUT,
             universal_newlines=True,
-            bufsize=1
+            bufsize=1,
         )
 
     def send_command(self, engine, command):
@@ -24,7 +24,7 @@ class SelfPlay:
         Send a command to a chess engine.
         """
         print(f"Sending command: {command}")
-        engine.stdin.write(command + '\n')
+        engine.stdin.write(command + "\n")
         engine.stdin.flush()
 
     def read_response(self, engine):
@@ -86,7 +86,6 @@ class SelfPlay:
         parts = best_move_response.split(" ")
         return parts[1]
 
-
     def _play_game(self, engine1, engine2, max_moves):
         current_engine = engine1
         next_engine = engine2
@@ -114,7 +113,6 @@ class SelfPlay:
                 print("No valid move found. Game over.")
                 break
 
-
     def play_game(self, max_moves=100):
         """
         Play a game between two engines, alternating moves until a move limit is reached or no valid moves are found.
@@ -128,6 +126,7 @@ class SelfPlay:
         # Terminate both engines
         engine1.terminate()
         engine2.terminate()
+
 
 if __name__ == "__main__":
     engine_command = ["..\\run_python.bat", "chess_engine.py"]
