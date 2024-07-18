@@ -35,7 +35,7 @@ class FENRecord:
 
         # TODO: ChatGPT: Handle rest of FEN string.
 
-    
+
     def board(self):
         def valid_board_character(character):
             return character in  ['k', 'K', 'Q', 'q', 'B', 'b', 'N', 'n', 'R', 'r', 'P', 'p']
@@ -142,7 +142,7 @@ class Board:
                 moves.append(((r, c), (new_r, new_c)))
 
         # TODO: ChatGPT: Handle promotion when the pawn reaches the final row.
-        
+
         return moves
 
     def generate_rook_moves(self, r, c):
@@ -198,13 +198,13 @@ class Board:
 
     def make_move(self, move):
         # Make a move on the board
-        (start, end) = move        
+        (start, end) = move
         self.board[end[0]][end[1]] = self.board[start[0]][start[1]]
         self.board[start[0]][start[1]] = '.'
 
     def undo_move(self, move, captured_piece):
         # Undo a move on the board
-        (start, end) = move        
+        (start, end) = move
         self.board[start[0]][start[1]] = self.board[end[0]][end[1]]
         self.board[end[0]][end[1]] = captured_piece
 
@@ -333,4 +333,3 @@ class UCIInterface:
 if __name__ == "__main__":
     uci_interface = UCIInterface()
     uci_interface.run()
-
