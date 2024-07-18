@@ -83,13 +83,6 @@ class FENRecord:
         return board
 
 
-def square_to_alg(square):
-    files = "abcdefgh"
-    ranks = "12345678"
-    # TODO: Chris: Figure out the logic of how ranks is converted.
-    return files[square[1]] + ranks[(BOARD_SIZE - 1) - square[0]]
-
-
 class Board:
     def __init__(self, fen_str):
         # Initialize the board using FEN notation
@@ -108,7 +101,7 @@ class Board:
     def print_legal_moves(self):
         legal_moves = self.generate_moves()
         legal_moves_as_algo = [
-            square_to_alg(start) + square_to_alg(end) for start, end in legal_moves
+            start.algebraic + end.algebraic for start, end in legal_moves
         ]
         print("Legal moves:\n" + " ".join(legal_moves_as_algo))
 
@@ -317,7 +310,7 @@ class ChessEngine:
                     break
             return min_eval, best_move
 
-    def best_move(self, depth):
+    def best_move(self, depth) -> Move:
         # TODO: ChatGPT: Add stalemate and winner detection.
         _, best_move = self.alpha_beta(depth, -float("inf"), float("inf"), True)
         return best_move
@@ -350,8 +343,7 @@ class UCIInterface:
     def go(self, depth):
         best_move = self.engine.best_move(depth)
         start, end = best_move
-        move_str = square_to_alg(start) + square_to_alg(end)
-        print(f"bestmove {move_str}")
+        print(f"bestmove {start.algebraic}{end.algebraic}")
 
     def print_board(self):
         self.board.display()
