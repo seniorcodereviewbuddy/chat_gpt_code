@@ -9,11 +9,10 @@ class SelfPlay:
         """
         Start a chess engine subprocess.
         """
-        return subprocess.Popen(
+        return subprocess.Popen(  # noqa
             self.engine_command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            # Chris change for better debugging.
             stderr=subprocess.STDOUT,
             universal_newlines=True,
             bufsize=1,
@@ -99,7 +98,8 @@ class SelfPlay:
                 move_history.append(best_move)
                 print(f"Move {move_count + 1}: {best_move}")
 
-                # TODO: Do we need to send everything from the beginning, or can we just send the moves it's missing?
+                # TODO: Do we need to send everything from the beginning, or can we
+                # just send the moves it's missing?
                 # Send the move to the next engine
                 position_command = f"position startpos moves {' '.join(move_history)}"
                 self.send_command(next_engine, position_command)
@@ -115,7 +115,9 @@ class SelfPlay:
 
     def play_game(self, max_moves=100):
         """
-        Play a game between two engines, alternating moves until a move limit is reached or no valid moves are found.
+        Play a game between two engines.
+
+        Moves are alternated until a move limit is reached or no valid moves are found.
         """
         # Start both engines
         engine1, engine2 = self._setup_engines()

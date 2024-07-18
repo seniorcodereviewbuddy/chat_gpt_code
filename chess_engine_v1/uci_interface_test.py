@@ -1,6 +1,7 @@
 import unittest
-from unittest.mock import patch
 from io import StringIO
+from unittest.mock import patch
+
 from chess_engine import UCIInterface
 
 
@@ -8,7 +9,7 @@ class TestUCIInterface(unittest.TestCase):
     @patch(
         "sys.stdin",
         StringIO(
-            "uci\nisready\nposition fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\ngo depth 1\nd\nquit\n"
+            "uci\nisready\nposition fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\ngo depth 1\nd\nquit\n"  # noqa
         ),
     )
     @patch("sys.stdout", new_callable=StringIO)
@@ -22,7 +23,8 @@ class TestUCIInterface(unittest.TestCase):
             "id author SCRB",
             "uciok",
             "readyok",
-            "bestmove [a-h][1-8][a-h][1-8]",  # Note: The exact move may vary depending on implementation
+            # Note: The exact move may vary depending on implementation.
+            "bestmove [a-h][1-8][a-h][1-8]",
         ]
 
         # TODO: look at all output, not just the first 5 lines.
