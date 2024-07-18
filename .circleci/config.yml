@@ -1,0 +1,24 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: continuumio/miniconda3
+
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: conda env create -f chat_gpt.yml
+
+      - run:
+          name: run tests
+          command: |
+            source activate chat_gpt
+            conda activate chat_gpt
+            python -m unittest discover -s chess_engine_v1 -p "*_test.py"
+
+workflows:
+  run_tests:
+    jobs:
+      - test
