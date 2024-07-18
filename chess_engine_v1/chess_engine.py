@@ -65,7 +65,7 @@ class FENRecord:
                 if char.isdigit():
                     board_row.extend(["."] * int(char))
                 else:
-                    if valid_board_character:
+                    if valid_board_character:  # type: ignore
                         board_row.append(char)
                     else:
                         raise Exception(f"Invalid chracter in FEN board, {char}")
