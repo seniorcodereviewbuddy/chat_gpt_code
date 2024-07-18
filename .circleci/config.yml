@@ -16,10 +16,9 @@ jobs:
           command: |
             source activate chat_gpt
             conda activate chat_gpt
-            python -m unittest discover -s chess_engine_v1 -p "*_test.py" 
+            python -m unittest discover -s chess_engine_v1 -p "*_test.py"
 
 workflows:
   run_tests:
     jobs:
       - test
-
