@@ -3,13 +3,6 @@ from square import Square
 BOARD_SIZE = 8
 
 
-def square_to_alg(square):
-    files = "abcdefgh"
-    ranks = "12345678"
-    # TODO: Chris: Figure out the logic of how ranks is converted.
-    return files[square[1]] + ranks[(BOARD_SIZE - 1) - square[0]]
-
-
 class Move:
     def __init__(
         self,
