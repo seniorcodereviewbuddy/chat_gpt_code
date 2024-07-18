@@ -135,7 +135,7 @@ class TestChessEngine(unittest.TestCase):
         move = self.engine.best_move(1)
         # TODO: Chris: Pretty sure this is wrong, but it's at least constant.
         self.assertEqual(move, ((7, 3), (1, 3)))
-        
+
 
 if __name__ == "__main__":
     unittest.main()
