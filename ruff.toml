@@ -1,0 +1,4 @@
+target-version = "py312"
+
+[lint]
+select = ["A", "B", "E", "F", "I", "N", "RUF", "S", "UP",  "W"]

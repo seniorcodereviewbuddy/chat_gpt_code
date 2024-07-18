@@ -1,4 +1,5 @@
 import unittest
+
 from chess_engine import Board, ChessEngine, Pieces
 
 # TODO: Chris: Fix all tests.
@@ -179,8 +180,8 @@ class TestChessEngine(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_best_move(self):
-        # White has 2 pawn that can't move and a king in the corner that can only move to one square.
-        # So there is only one move white can make.
+        # White has 2 pawn that can't move and a king in the corner that can only move
+        # to one square. So there is only one move white can make.
         fen = "8/8/8/8/7k/6pp/6PP/7K w - - 0 1"  # noqa
         board = Board(self.fen)  # noqa
         engine = ChessEngine(self.board)  # noqa

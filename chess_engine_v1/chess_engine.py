@@ -72,7 +72,8 @@ class FENRecord:
 
             if len(board_row) != BOARD_SIZE:
                 raise Exception(
-                    f"FEN record error, found row of size {len(board_row)}, expecting {BOARD_SIZE}"
+                    f"FEN record error, found row of size {len(board_row)}, "
+                    f"expecting {BOARD_SIZE}"
                 )
             board.append(board_row)
         return board
@@ -268,23 +269,24 @@ class ChessEngine:
         return score
 
     # TODO: Chris: Come up with an enum for is_maximizing.
-    # TODO: Instead of changing self.board all the time, we should be passing in a new Board for each
-    # call. This way we could easily multithread in the future. And it makes sense that self.board would
-    # always refer to the current state, instead of changing around a bunch.
+    # TODO: Instead of changing self.board all the time, we should be passing in a new
+    # Board for each call. This way we could easily multithread in the future. And it
+    # makes sense that self.board would always refer to the current state, instead of
+    # changing around a bunch.
     def alpha_beta(self, depth, alpha, beta, is_maximizing):
         if depth == 0:
             return self.evaluate(), None
 
         legal_moves = self.board.generate_moves()
-        # TODO: Look at pulling the common functionality of the two bodies of this if statement into
-        # a common helper function to reduce repeated code.
+        # TODO: Look at pulling the common functionality of the two bodies of this if
+        # statement into a common helper function to reduce repeated code.
         if is_maximizing:
             max_eval = -float("inf")
             best_move = None
             for move in legal_moves:
                 square_previous_contents = self.board.board[move[1][0]][move[1][1]]
                 self.board.make_move(move)
-                eval, _ = self.alpha_beta(depth - 1, alpha, beta, False)
+                eval, _ = self.alpha_beta(depth - 1, alpha, beta, False)  # noqa
                 self.board.undo_move(move, square_previous_contents)
                 if eval > max_eval:
                     max_eval = eval
@@ -299,7 +301,7 @@ class ChessEngine:
             for move in legal_moves:
                 captured_piece = self.board.board[move[1][0]][move[1][1]]
                 self.board.make_move(move)
-                eval, _ = self.alpha_beta(depth - 1, alpha, beta, True)
+                eval, _ = self.alpha_beta(depth - 1, alpha, beta, True)  # noqa
                 self.board.undo_move(move, captured_piece)
                 if eval < min_eval:
                     min_eval = eval
