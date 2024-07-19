@@ -1,11 +1,13 @@
 import subprocess
 
+ENGINE_TYPE = subprocess.Popen[str]
+
 
 class SelfPlay:
-    def __init__(self, engine_command):
+    def __init__(self, engine_command: list[str]):
         self.engine_command = engine_command
 
-    def start_engine(self):
+    def start_engine(self) -> ENGINE_TYPE:
         """
         Start a chess engine subprocess.
         """
@@ -18,15 +20,15 @@ class SelfPlay:
             bufsize=1,
         )
 
-    def send_command(self, engine, command):
+    def send_command(self, engine: ENGINE_TYPE, command: str) -> None:
         """
         Send a command to a chess engine.
         """
         print(f"Sending command: {command}")
-        engine.stdin.write(command + "\n")
-        engine.stdin.flush()
+        engine.stdin.write(command + "\n")  # type: ignore # see https://github.com/python/typeshed/issues/3831
+        engine.stdin.flush()  # type: ignore # see https://github.com/python/typeshed/issues/3831
 
-    def read_response(self, engine):
+    def read_response(self, engine: ENGINE_TYPE) -> str:
         """
         Read the response from a chess engine.
         """
@@ -34,7 +36,7 @@ class SelfPlay:
 
         response = ""
         while True:
-            line = engine.stdout.readline().strip()
+            line = engine.stdout.readline().strip()  # type: ignore # see https://github.com/python/typeshed/issues/3831
             if line:
                 print(f"Received response: {line}")
                 response += line + "\n"
@@ -44,22 +46,22 @@ class SelfPlay:
         return response
 
     # TODO: Try and merge this with read_response.
-    def read_board(self, engine):
+    def read_board(self, engine: ENGINE_TYPE) -> None:
         """
         Read the board state from the engine and print it.
         """
         self.send_command(engine, "d")
 
         while True:
-            line = engine.stdout.readline().strip()
+            line = engine.stdout.readline().strip()  # type: ignore # see https://github.com/python/typeshed/issues/3831
             if line == "Legal moves:":
                 # Read the next line of the legal moves and ignore them
-                engine.stdout.readline()
+                engine.stdout.readline()  # type: ignore # see https://github.com/python/typeshed/issues/3831
                 break
             # Chris: Flush to help debug.
             print(line, flush=True)
 
-    def _setup_engines(self):
+    def _setup_engines(self) -> tuple[ENGINE_TYPE, ENGINE_TYPE]:
         # Start both engines
         engine1 = self.start_engine()
         engine2 = self.start_engine()
@@ -78,14 +80,16 @@ class SelfPlay:
 
         return engine1, engine2
 
-    def _move_from_best_move_response(self, best_move_response):
+    def _move_from_best_move_response(self, best_move_response: str) -> str:
         # TODO: Add error handling.
         # The bestmove response should look like:
         # bestmove {move} [(optional) ponder {move}]
         parts = best_move_response.split(" ")
         return parts[1]
 
-    def _play_game(self, engine1, engine2, max_moves):
+    def _play_game(
+        self, engine1: ENGINE_TYPE, engine2: ENGINE_TYPE, max_moves: int
+    ) -> None:
         current_engine = engine1
         next_engine = engine2
         move_history = []
@@ -113,7 +117,7 @@ class SelfPlay:
                 print("No valid move found. Game over.")
                 break
 
-    def play_game(self, max_moves=100):
+    def play_game(self, max_moves: int = 100) -> None:
         """
         Play a game between two engines.
 
