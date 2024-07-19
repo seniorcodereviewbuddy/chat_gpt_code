@@ -37,14 +37,14 @@ class FENRecord:
 
     """You can learn more about the FEN Record format at https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation"""
 
-    def __init__(self, fen_str):
+    def __init__(self, fen_str: str):
         fen_parts = fen_str.split(" ")
         self.board_str = fen_parts[0]
 
         # TODO: ChatGPT: Handle rest of FEN string.
 
-    def board(self):
-        def valid_board_character(character):
+    def board(self) -> list[list[str]]:
+        def valid_board_character(character: str) -> bool:
             return character in [
                 "k",
                 "K",
@@ -85,13 +85,13 @@ class FENRecord:
 
 
 class Board:
-    def __init__(self, fen_str):
+    def __init__(self, fen_str: str):
         # Initialize the board using FEN notation
         fen = FENRecord(fen_str)
         self.board = fen.board()
         self.turn = Player.WHITE
 
-    def display(self):
+    def display(self) -> None:
         # Print the board state
         # Print the board reversed as row 1 is stored first in the array, but we want
         # to print row 8 at the top first.
@@ -99,17 +99,17 @@ class Board:
             print(" ".join(row))
         print()
 
-    def print_legal_moves(self):
+    def print_legal_moves(self) -> None:
         legal_moves = self.generate_moves()
         legal_moves_as_algo = [
             move.start.algebraic + move.end.algebraic for move in legal_moves
         ]
         print("Legal moves:\n" + " ".join(legal_moves_as_algo))
 
-    def _piece_owned_by_current_player(self, piece):
+    def _piece_owned_by_current_player(self, piece: str) -> bool:
         return piece.isupper() if self.turn == Player.WHITE else piece.islower()
 
-    def _piece_capturable_by_current_player(self, piece):
+    def _piece_capturable_by_current_player(self, piece: str) -> bool:
         return not self._piece_owned_by_current_player(piece)
 
     def _create_move(
@@ -135,7 +135,7 @@ class Board:
                     moves.extend(self.generate_piece_moves(r, c))
         return moves
 
-    def generate_piece_moves(self, r, c) -> list[Move]:
+    def generate_piece_moves(self, r: int, c: int) -> list[Move]:
         # Generate legal moves for a specific piece
 
         # TODO: ChatGPT: Remove moves that expose the king to capture.
@@ -199,7 +199,9 @@ class Board:
     def _on_board(self, r: int, c: int) -> bool:
         return 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE
 
-    def generate_sliding_moves(self, r: int, c: int, directions) -> list[Move]:
+    def generate_sliding_moves(
+        self, r: int, c: int, directions: list[tuple[int, int]]
+    ) -> list[Move]:
         # Generate sliding moves for rooks, bishops, and queens.
         piece = self.board[r][c]  # noqa
         moves = []
@@ -259,10 +261,10 @@ class Board:
 
 
 class ChessEngine:
-    def __init__(self, board):
+    def __init__(self, board: Board):
         self.board = board
 
-    def evaluate(self):
+    def evaluate(self) -> int:
         # Evaluate the board state (material balance)
         piece_values = {
             "P": 1,
@@ -290,7 +292,9 @@ class ChessEngine:
     # Board for each call. This way we could easily multithread in the future. And it
     # makes sense that self.board would always refer to the current state, instead of
     # changing around a bunch.
-    def alpha_beta(self, depth, alpha, beta, is_maximizing):
+    def alpha_beta(
+        self, depth: int, alpha: float, beta: float, is_maximizing: bool
+    ) -> tuple[float, Move | None]:
         if depth == 0:
             return self.evaluate(), None
 
@@ -326,7 +330,7 @@ class ChessEngine:
                     break
             return min_eval, best_move
 
-    def best_move(self, depth) -> Move:
+    def best_move(self, depth: int) -> Move | None:
         # TODO: ChatGPT: Add stalemate and winner detection.
         _, best_move = self.alpha_beta(depth, -float("inf"), float("inf"), True)
         return best_move
@@ -340,32 +344,32 @@ def uci_algebraic_notation(move: Move) -> str:
 
 
 class UCIInterface:
-    def __init__(self):
+    def __init__(self) -> None:
         self.board = None
-        self.engine = ChessEngine(self.board)
+        self.engine = ChessEngine(self.board)  # type: ignore
 
-    def uci(self):
+    def uci(self) -> None:
         print("id name SimpleChessEngine")
         print("id author SCRB")
         print("uciok")
 
-    def isready(self):
+    def isready(self) -> None:
         print("readyok")
 
-    def position(self, fen):
-        self.board = Board(fen)
-        self.engine = ChessEngine(self.board)
+    def position(self, fen: str) -> None:
+        self.board = Board(fen)  # type: ignore
+        self.engine = ChessEngine(self.board)  # type: ignore
 
-    def go(self, depth):
+    def go(self, depth: int) -> None:
         best_move = self.engine.best_move(depth)
-        move_in_uci_alge = uci_algebraic_notation(best_move)
+        move_in_uci_alge = uci_algebraic_notation(best_move)  # type: ignore
         print(f"bestmove {move_in_uci_alge}")
 
-    def print_board(self):
-        self.board.display()
-        self.board.print_legal_moves()
+    def print_board(self) -> None:
+        self.board.display()  # type: ignore
+        self.board.print_legal_moves()  # type: ignore
 
-    def run(self):
+    def run(self) -> None:
         while True:
             try:
                 # TODO: Have this loop just handle routing the commands to the
