@@ -61,7 +61,9 @@ class FENRecord:
 
         board = []
         rows = self.board_str.split("/")
-        for row in rows:
+        # Store the rows in reversed order because FEN start with row 8 and works down
+        # to row 1.
+        for row in reversed(rows):
             board_row = []
             for char in row:
                 if char.isdigit():
@@ -97,7 +99,9 @@ class Board:
 
     def display(self):
         # Print the board state
-        for row in self.board:
+        # Print the board reversed as row 1 is stored first in the array, but we want
+        # to print row 8 at the top first.
+        for row in reversed(self.board):
             print(" ".join(row))
         print()
 
@@ -147,8 +151,8 @@ class Board:
     def generate_pawn_moves(self, r, c):
         # Generate legal pawn moves
         moves = []
-        direction = -1 if self.turn == Player.WHITE else 1
-        start_row = 6 if self.turn == Player.WHITE else 1
+        direction = 1 if self.turn == Player.WHITE else -1
+        start_row = 1 if self.turn == Player.WHITE else 6
 
         # Single square move
         if self.board[r + direction][c] == ".":
