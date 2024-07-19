@@ -18,3 +18,11 @@ repos:
     rev: v1.10.0
     hooks:
     -   id: mypy
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+    - id: mypy
+      name: mypy strict
+      args: [--strict]
+      # TODO: Once this exclude list is handle, we can delete the non-strict mypy step and just run this one.
+      exclude: chess_engine_test.py|move_test.py|square_test.py|chess_engine.py|uci_interface_test.py|self_play.py
