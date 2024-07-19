@@ -24,7 +24,7 @@ class TestUCIInterface(unittest.TestCase):
         ),
     )
     @patch("sys.stdout", new_callable=StringIO)
-    def test_uci_commands(self, mock_stdout):
+    def test_uci_commands(self, mock_stdout: StringIO) -> None:
         uci_interface = UCIInterface()
         uci_interface.run()
 

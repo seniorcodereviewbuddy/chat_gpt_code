@@ -8,13 +8,13 @@ from square import Squares
 
 
 class TestChessEngine(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         # Initialize the board and engine with a starting position
         self.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         self.board = Board(self.fen)
         self.engine = ChessEngine(self.board)
 
-    def test_parse_fen(self):
+    def test_parse_fen(self) -> None:
         # Test the FEN parsing
         expected_board = [
             ["R", "N", "B", "Q", "K", "B", "N", "R"],
@@ -37,7 +37,7 @@ class TestChessEngine(unittest.TestCase):
     # -Pawn promotions
     # -Where some squares are blocked
 
-    def test_generate_pawn_moves(self):
+    def test_generate_pawn_moves(self) -> None:
         # Test pawn move generation
         self.board.board[1][0] = Pieces.WHITE_PAWN
         moves = self.board.generate_piece_moves(1, 0)
@@ -48,7 +48,7 @@ class TestChessEngine(unittest.TestCase):
         self.assertSetEqual(set(moves), set(expected_moves))
 
     @unittest.expectedFailure
-    def test_generate_rook_moves(self):
+    def test_generate_rook_moves(self) -> None:
         # Test rook move generation
         self.board.board[4][4] = Pieces.WHITE_ROOK
         moves = self.board.generate_piece_moves(4, 4)
@@ -70,7 +70,7 @@ class TestChessEngine(unittest.TestCase):
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
-    def test_generate_knight_moves(self):
+    def test_generate_knight_moves(self) -> None:
         # Test knight move generation
         self.board.board[4][4] = Pieces.WHITE_KNIGHT
         moves = self.board.generate_piece_moves(4, 4)
@@ -97,7 +97,7 @@ class TestChessEngine(unittest.TestCase):
         self.assertSetEqual(set(moves), set(expected_moves))
 
     @unittest.expectedFailure
-    def test_generate_bishop_moves(self):
+    def test_generate_bishop_moves(self) -> None:
         # Test bishop move generation
         self.board.board[4][4] = Pieces.WHITE_BISHOP
         moves = self.board.generate_piece_moves(4, 4)
@@ -119,7 +119,7 @@ class TestChessEngine(unittest.TestCase):
         self.assertSetEqual(set(moves), set(expected_moves))
 
     @unittest.expectedFailure
-    def test_generate_queen_moves(self):
+    def test_generate_queen_moves(self) -> None:
         # Test queen move generation
         self.board.board[4][4] = Pieces.WHITE_QUEEN
         moves = self.board.generate_piece_moves(4, 4)
@@ -156,7 +156,7 @@ class TestChessEngine(unittest.TestCase):
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
-    def test_generate_king_moves(self):
+    def test_generate_king_moves(self) -> None:
         # Test king move generation
         self.board.board[4][4] = Pieces.WHITE_KING
         moves = self.board.generate_piece_moves(4, 4)
@@ -174,7 +174,7 @@ class TestChessEngine(unittest.TestCase):
 
     # TODO: ChatGPT: Add more test cases here.
     # Tests should include ensuring undo returns captured pieces correctly.
-    def test_make_and_undo_move(self):
+    def test_make_and_undo_move(self) -> None:
         # Test making and undoing a move
         move = Move(Squares.A2, Squares.A4, Pieces.WHITE_PAWN)
         self.board.make_move(move)
@@ -188,7 +188,7 @@ class TestChessEngine(unittest.TestCase):
         )
         self.assertEqual(self.board.board[move.end.row][move.end.col], ".")
 
-    def test_evaluate(self):
+    def test_evaluate(self) -> None:
         # Test the evaluation function
         self.assertEqual(self.engine.evaluate(), 0)  # Initial position is balanced
 
@@ -197,7 +197,7 @@ class TestChessEngine(unittest.TestCase):
         self.assertEqual(self.engine.evaluate(), 9)
 
     @unittest.expectedFailure
-    def test_best_move(self):
+    def test_best_move(self) -> None:
         # White has 2 pawn that can't move and a king in the corner that can only move
         # to one square. So there is only one move white can make.
         fen = "8/8/8/8/7k/6pp/6PP/7K w - - 0 1"  # noqa
@@ -211,7 +211,7 @@ class TestChessEngine(unittest.TestCase):
 
 
 class TestUCIAlgebraicNotation(unittest.TestCase):
-    def test_uci_algebraic_notation_white(self):
+    def test_uci_algebraic_notation_white(self) -> None:
         move = Move(Squares.E2, Squares.E4, "P")
         self.assertEqual(uci_algebraic_notation(move), "e2e4")
 
@@ -221,7 +221,7 @@ class TestUCIAlgebraicNotation(unittest.TestCase):
         move = Move(Squares.E7, Squares.E8, "P", promotion_piece="Q")
         self.assertEqual(uci_algebraic_notation(move), "e7e8q")
 
-    def test_uci_algebraic_notation_black(self):
+    def test_uci_algebraic_notation_black(self) -> None:
         move = Move(Squares.E7, Squares.E5, "p")
         self.assertEqual(uci_algebraic_notation(move), "e7e5")
 
