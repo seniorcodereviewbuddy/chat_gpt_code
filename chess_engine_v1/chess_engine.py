@@ -1,6 +1,7 @@
 import enum
 
 from move import Move
+from square import Squares
 
 
 class Player(enum.Enum):
@@ -83,13 +84,6 @@ class FENRecord:
         return board
 
 
-def square_to_alg(square):
-    files = "abcdefgh"
-    ranks = "12345678"
-    # TODO: Chris: Figure out the logic of how ranks is converted.
-    return files[square[1]] + ranks[(BOARD_SIZE - 1) - square[0]]
-
-
 class Board:
     def __init__(self, fen_str):
         # Initialize the board using FEN notation
@@ -108,7 +102,7 @@ class Board:
     def print_legal_moves(self):
         legal_moves = self.generate_moves()
         legal_moves_as_algo = [
-            square_to_alg(start) + square_to_alg(end) for start, end in legal_moves
+            move.start.algebraic + move.end.algebraic for move in legal_moves
         ]
         print("Legal moves:\n" + " ".join(legal_moves_as_algo))
 
@@ -118,7 +112,20 @@ class Board:
     def _piece_capturable_by_current_player(self, piece):
         return not self._piece_owned_by_current_player(piece)
 
-    def generate_moves(self):
+    def _create_move(
+        self, initial_row: int, initial_col: int, new_row: int, new_col: int
+    ) -> Move:
+        initial_square = Squares.square_from_row_col(initial_row, initial_col)
+        new_square = Squares.square_from_row_col(new_row, new_col)
+        moving_piece = self.board[initial_row][initial_col]
+        captured_piece = (
+            None
+            if self.board[new_row][new_col] == "."
+            else self.board[new_row][new_col]
+        )
+        return Move(initial_square, new_square, moving_piece, captured_piece)
+
+    def generate_moves(self) -> list[Move]:
         # Generate all legal moves for the current player
         moves = []
         for r in range(BOARD_SIZE):
@@ -128,7 +135,7 @@ class Board:
                     moves.extend(self.generate_piece_moves(r, c))
         return moves
 
-    def generate_piece_moves(self, r, c):
+    def generate_piece_moves(self, r, c) -> list[Move]:
         # Generate legal moves for a specific piece
 
         # TODO: ChatGPT: Remove moves that expose the king to capture.
@@ -148,7 +155,7 @@ class Board:
 
         raise Exception(f"Trying to generate moves for an unknown piece, {piece}")
 
-    def generate_pawn_moves(self, r, c):
+    def generate_pawn_moves(self, r: int, c: int) -> list[Move]:
         # Generate legal pawn moves
         moves = []
         direction = 1 if self.turn == Player.WHITE else -1
@@ -156,10 +163,10 @@ class Board:
 
         # Single square move
         if self.board[r + direction][c] == ".":
-            moves.append(((r, c), (r + direction, c)))
+            moves.append(self._create_move(r, c, r + direction, c))
             # Double square move
             if r == start_row and self.board[r + 2 * direction][c] == ".":
-                moves.append(((r, c), (r + 2 * direction, c)))
+                moves.append(self._create_move(r, c, r + 2 * direction, c))
 
         # Captures
         # TODO: ChatGPT: Handle en-passant captures.
@@ -171,44 +178,46 @@ class Board:
                 and self.board[new_r][new_c] != "."
                 and self._piece_capturable_by_current_player(self.board[new_r][new_c])
             ):
-                moves.append(((r, c), (new_r, new_c)))
+                moves.append(self._create_move(r, c, new_r, new_c))
 
         # TODO: ChatGPT: Handle promotion when the pawn reaches the final row.
 
         return moves
 
-    def generate_rook_moves(self, r, c):
+    def generate_rook_moves(self, r: int, c: int) -> list[Move]:
         # Generate legal rook moves
         return self.generate_sliding_moves(r, c, VERTICAL_AND_HORIZONTAL_DIRECTIONS)
 
-    def generate_bishop_moves(self, r, c):
+    def generate_bishop_moves(self, r: int, c: int) -> list[Move]:
         # Generate legal bishop moves
         return self.generate_sliding_moves(r, c, DIAGONAL_DIRECTIONS)
 
-    def generate_queen_moves(self, r, c):
+    def generate_queen_moves(self, r: int, c: int) -> list[Move]:
         # Generate legal queen moves
         return self.generate_sliding_moves(r, c, ALL_DIRECTIONS)
 
-    def _on_board(self, r, c):
+    def _on_board(self, r: int, c: int) -> bool:
         return 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE
 
-    def generate_sliding_moves(self, r, c, directions):
-        # Generate sliding moves for rooks, bishops, and queens
+    def generate_sliding_moves(self, r: int, c: int, directions) -> list[Move]:
+        # Generate sliding moves for rooks, bishops, and queens.
         piece = self.board[r][c]  # noqa
         moves = []
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
             while self._on_board(nr, nc):
-                if self.board[nr][nc] == ".":
-                    moves.append(((r, c), (nr, nc)))
-                elif self._piece_capturable_by_current_player(self.board[nr][nc]):
-                    moves.append(((r, c), (nr, nc)))
+                if self.board[nr][
+                    nc
+                ] == "." or self._piece_capturable_by_current_player(
+                    self.board[nr][nc]
+                ):
+                    moves.append(self._create_move(r, c, nr, nc))
                     break
                 nr += dr
                 nc += dc
         return moves
 
-    def generate_knight_moves(self, r, c):
+    def generate_knight_moves(self, r: int, c: int) -> list[Move]:
         # Generate legal knight moves
         moves = []
         for dr, dc in KNIGHT_MOVES:
@@ -219,10 +228,10 @@ class Board:
                 ] == "." or self._piece_capturable_by_current_player(
                     self.board[nr][nc]
                 ):
-                    moves.append(((r, c), (nr, nc)))
+                    moves.append(self._create_move(r, c, nr, nc))
         return moves
 
-    def generate_king_moves(self, r, c):
+    def generate_king_moves(self, r: int, c: int) -> list[Move]:
         # Generate legal king moves
         moves = []
         for dr, dc in ALL_DIRECTIONS:
@@ -231,20 +240,22 @@ class Board:
                 if self.board[nr][nc] == "." or self._piece_owned_by_current_player(
                     self.board[nr][nc]
                 ):
-                    moves.append(((r, c), (nr, nc)))
+                    moves.append(self._create_move(r, c, nr, nc))
         return moves
 
-    def make_move(self, move):
+    def make_move(self, move: Move) -> None:
         # Make a move on the board
-        (start, end) = move
-        self.board[end[0]][end[1]] = self.board[start[0]][start[1]]
-        self.board[start[0]][start[1]] = "."
+        self.board[move.end.row][move.end.col] = (
+            move.promotion_piece if move.promotion_piece else move.piece_moved
+        )
+        self.board[move.start.row][move.start.col] = "."
 
-    def undo_move(self, move, captured_piece):
+    def undo_move(self, move: Move) -> None:
         # Undo a move on the board
-        (start, end) = move
-        self.board[start[0]][start[1]] = self.board[end[0]][end[1]]
-        self.board[end[0]][end[1]] = captured_piece
+        self.board[move.start.row][move.start.col] = move.piece_moved
+        self.board[move.end.row][move.end.col] = (
+            move.piece_captured if move.piece_captured else "."
+        )
 
 
 class ChessEngine:
@@ -290,10 +301,9 @@ class ChessEngine:
             max_eval = -float("inf")
             best_move = None
             for move in legal_moves:
-                square_previous_contents = self.board.board[move[1][0]][move[1][1]]
                 self.board.make_move(move)
                 eval, _ = self.alpha_beta(depth - 1, alpha, beta, False)  # noqa
-                self.board.undo_move(move, square_previous_contents)
+                self.board.undo_move(move)
                 if eval > max_eval:
                     max_eval = eval
                     best_move = move
@@ -305,10 +315,9 @@ class ChessEngine:
             min_eval = float("inf")
             best_move = None
             for move in legal_moves:
-                captured_piece = self.board.board[move[1][0]][move[1][1]]
                 self.board.make_move(move)
                 eval, _ = self.alpha_beta(depth - 1, alpha, beta, True)  # noqa
-                self.board.undo_move(move, captured_piece)
+                self.board.undo_move(move)
                 if eval < min_eval:
                     min_eval = eval
                     best_move = move
@@ -317,7 +326,7 @@ class ChessEngine:
                     break
             return min_eval, best_move
 
-    def best_move(self, depth):
+    def best_move(self, depth) -> Move:
         # TODO: ChatGPT: Add stalemate and winner detection.
         _, best_move = self.alpha_beta(depth, -float("inf"), float("inf"), True)
         return best_move
@@ -349,9 +358,8 @@ class UCIInterface:
 
     def go(self, depth):
         best_move = self.engine.best_move(depth)
-        start, end = best_move
-        move_str = square_to_alg(start) + square_to_alg(end)
-        print(f"bestmove {move_str}")
+        move_in_uci_alge = uci_algebraic_notation(best_move)
+        print(f"bestmove {move_in_uci_alge}")
 
     def print_board(self):
         self.board.display()

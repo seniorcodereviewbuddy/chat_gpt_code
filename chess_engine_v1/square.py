@@ -4,9 +4,6 @@ class Square:
         self.row = int(algebraic[1]) - 1
         self.col = ord(algebraic[0]) - ord("a")
 
-    # @classmethod
-    # def square_from_row_col(cls, row: int, col: int) -> "Square":
-
     def __str__(self) -> str:
         return self.algebraic
 
