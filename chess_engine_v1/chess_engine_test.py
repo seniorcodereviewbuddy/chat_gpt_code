@@ -41,7 +41,10 @@ class TestChessEngine(unittest.TestCase):
         # Test pawn move generation
         self.board.board[1][0] = Pieces.WHITE_PAWN
         moves = self.board.generate_piece_moves(1, 0)
-        expected_moves = [((1, 0), (2, 0)), ((1, 0), (3, 0))]
+        expected_moves = [
+            Move(Squares.A2, Squares.A3, Pieces.WHITE_PAWN),
+            Move(Squares.A2, Squares.A4, Pieces.WHITE_PAWN),
+        ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
     @unittest.expectedFailure
@@ -72,14 +75,24 @@ class TestChessEngine(unittest.TestCase):
         self.board.board[4][4] = Pieces.WHITE_KNIGHT
         moves = self.board.generate_piece_moves(4, 4)
         expected_moves = [
-            ((4, 4), (6, 5)),
-            ((4, 4), (6, 3)),
-            ((4, 4), (5, 6)),
-            ((4, 4), (5, 2)),
-            ((4, 4), (3, 6)),
-            ((4, 4), (3, 2)),
-            ((4, 4), (2, 5)),
-            ((4, 4), (2, 3)),
+            Move(Squares.E5, Squares.C4, Pieces.WHITE_KNIGHT),
+            Move(Squares.E5, Squares.C6, Pieces.WHITE_KNIGHT),
+            Move(Squares.E5, Squares.D3, Pieces.WHITE_KNIGHT),
+            Move(
+                Squares.E5,
+                Squares.D7,
+                Pieces.WHITE_KNIGHT,
+                piece_captured=Pieces.BLACK_PAWN,
+            ),
+            Move(Squares.E5, Squares.F3, Pieces.WHITE_KNIGHT),
+            Move(
+                Squares.E5,
+                Squares.F7,
+                Pieces.WHITE_KNIGHT,
+                piece_captured=Pieces.BLACK_PAWN,
+            ),
+            Move(Squares.E5, Squares.G4, Pieces.WHITE_KNIGHT),
+            Move(Squares.E5, Squares.G6, Pieces.WHITE_KNIGHT),
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
@@ -148,14 +161,14 @@ class TestChessEngine(unittest.TestCase):
         self.board.board[4][4] = Pieces.WHITE_KING
         moves = self.board.generate_piece_moves(4, 4)
         expected_moves = [
-            ((4, 4), (5, 4)),
-            ((4, 4), (5, 5)),
-            ((4, 4), (4, 5)),
-            ((4, 4), (3, 5)),
-            ((4, 4), (3, 4)),
-            ((4, 4), (3, 3)),
-            ((4, 4), (4, 3)),
-            ((4, 4), (5, 3)),
+            Move(Squares.E5, Squares.D4, Pieces.WHITE_KING),
+            Move(Squares.E5, Squares.D5, Pieces.WHITE_KING),
+            Move(Squares.E5, Squares.D6, Pieces.WHITE_KING),
+            Move(Squares.E5, Squares.E4, Pieces.WHITE_KING),
+            Move(Squares.E5, Squares.E6, Pieces.WHITE_KING),
+            Move(Squares.E5, Squares.F4, Pieces.WHITE_KING),
+            Move(Squares.E5, Squares.F5, Pieces.WHITE_KING),
+            Move(Squares.E5, Squares.F6, Pieces.WHITE_KING),
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
@@ -163,13 +176,17 @@ class TestChessEngine(unittest.TestCase):
     # Tests should include ensuring undo returns captured pieces correctly.
     def test_make_and_undo_move(self):
         # Test making and undoing a move
-        move = ((1, 0), (3, 0))
+        move = Move(Squares.A2, Squares.A4, Pieces.WHITE_PAWN)
         self.board.make_move(move)
-        self.assertEqual(self.board.board[1][0], ".")
-        self.assertEqual(self.board.board[3][0], Pieces.WHITE_PAWN)
-        self.board.undo_move(move, ".")
-        self.assertEqual(self.board.board[1][0], Pieces.WHITE_PAWN)
-        self.assertEqual(self.board.board[3][0], ".")
+        self.assertEqual(self.board.board[move.start.row][move.start.col], ".")
+        self.assertEqual(
+            self.board.board[move.end.row][move.end.col], Pieces.WHITE_PAWN
+        )
+        self.board.undo_move(move)
+        self.assertEqual(
+            self.board.board[move.start.row][move.start.col], Pieces.WHITE_PAWN
+        )
+        self.assertEqual(self.board.board[move.end.row][move.end.col], ".")
 
     def test_evaluate(self):
         # Test the evaluation function
