@@ -17,14 +17,14 @@ class TestChessEngine(unittest.TestCase):
     def test_parse_fen(self):
         # Test the FEN parsing
         expected_board = [
-            ["r", "n", "b", "q", "k", "b", "n", "r"],
-            ["p", "p", "p", "p", "p", "p", "p", "p"],
-            [".", ".", ".", ".", ".", ".", ".", "."],
-            [".", ".", ".", ".", ".", ".", ".", "."],
-            [".", ".", ".", ".", ".", ".", ".", "."],
-            [".", ".", ".", ".", ".", ".", ".", "."],
-            ["P", "P", "P", "P", "P", "P", "P", "P"],
             ["R", "N", "B", "Q", "K", "B", "N", "R"],
+            ["P", "P", "P", "P", "P", "P", "P", "P"],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            ["p", "p", "p", "p", "p", "p", "p", "p"],
+            ["r", "n", "b", "q", "k", "b", "n", "r"],
         ]
         self.assertEqual(self.board.board, expected_board)
 
@@ -39,9 +39,9 @@ class TestChessEngine(unittest.TestCase):
 
     def test_generate_pawn_moves(self):
         # Test pawn move generation
-        self.board.board[6][0] = Pieces.WHITE_PAWN
-        moves = self.board.generate_piece_moves(6, 0)
-        expected_moves = [((6, 0), (5, 0)), ((6, 0), (4, 0))]
+        self.board.board[1][0] = Pieces.WHITE_PAWN
+        moves = self.board.generate_piece_moves(1, 0)
+        expected_moves = [((1, 0), (2, 0)), ((1, 0), (3, 0))]
         self.assertSetEqual(set(moves), set(expected_moves))
 
     @unittest.expectedFailure
@@ -67,7 +67,6 @@ class TestChessEngine(unittest.TestCase):
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
-    @unittest.expectedFailure
     def test_generate_knight_moves(self):
         # Test knight move generation
         self.board.board[4][4] = Pieces.WHITE_KNIGHT
@@ -164,13 +163,13 @@ class TestChessEngine(unittest.TestCase):
     # Tests should include ensuring undo returns captured pieces correctly.
     def test_make_and_undo_move(self):
         # Test making and undoing a move
-        move = ((6, 0), (4, 0))
+        move = ((1, 0), (3, 0))
         self.board.make_move(move)
-        self.assertEqual(self.board.board[6][0], ".")
-        self.assertEqual(self.board.board[4][0], Pieces.WHITE_PAWN)
+        self.assertEqual(self.board.board[1][0], ".")
+        self.assertEqual(self.board.board[3][0], Pieces.WHITE_PAWN)
         self.board.undo_move(move, ".")
-        self.assertEqual(self.board.board[6][0], Pieces.WHITE_PAWN)
-        self.assertEqual(self.board.board[4][0], ".")
+        self.assertEqual(self.board.board[1][0], Pieces.WHITE_PAWN)
+        self.assertEqual(self.board.board[3][0], ".")
 
     def test_evaluate(self):
         # Test the evaluation function
