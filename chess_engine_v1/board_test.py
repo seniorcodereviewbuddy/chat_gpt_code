@@ -42,26 +42,25 @@ class TestBoard(unittest.TestCase):
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
-    @unittest.expectedFailure
     def test_generate_rook_moves(self) -> None:
         board = Board()
         board.board[4][4] = Pieces.WHITE_ROOK
         moves = board.generate_piece_moves(4, 4)
         expected_moves = [
-            ((4, 4), (4, 5)),
-            ((4, 4), (4, 6)),
-            ((4, 4), (4, 7)),
-            ((4, 4), (4, 3)),
-            ((4, 4), (4, 2)),
-            ((4, 4), (4, 1)),
-            ((4, 4), (4, 0)),
-            ((4, 4), (5, 4)),
-            ((4, 4), (6, 4)),
-            ((4, 4), (7, 4)),
-            ((4, 4), (3, 4)),
-            ((4, 4), (2, 4)),
-            ((4, 4), (1, 4)),
-            ((4, 4), (0, 4)),
+            Move(Squares.E5, Squares.A5, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.B5, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.C5, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.D5, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.F5, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.G5, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.H5, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.E1, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.E2, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.E3, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.E4, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.E6, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.E7, Pieces.WHITE_ROOK),
+            Move(Squares.E5, Squares.E8, Pieces.WHITE_ROOK),
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
@@ -89,63 +88,61 @@ class TestBoard(unittest.TestCase):
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
-    @unittest.expectedFailure
     def test_generate_bishop_moves(self) -> None:
         board = Board()
         board.board[4][4] = Pieces.WHITE_BISHOP
         moves = board.generate_piece_moves(4, 4)
         expected_moves = [
-            ((4, 4), (5, 5)),
-            ((4, 4), (6, 6)),
-            ((4, 4), (7, 7)),
-            ((4, 4), (3, 3)),
-            ((4, 4), (2, 2)),
-            ((4, 4), (1, 1)),
-            ((4, 4), (0, 0)),
-            ((4, 4), (5, 3)),
-            ((4, 4), (6, 2)),
-            ((4, 4), (7, 1)),
-            ((4, 4), (3, 5)),
-            ((4, 4), (2, 6)),
-            ((4, 4), (1, 7)),
+            Move(Squares.E5, Squares.A1, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.B2, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.C3, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.D4, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.F6, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.G7, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.H8, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.B8, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.C7, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.D6, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.F4, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.G3, Pieces.WHITE_BISHOP),
+            Move(Squares.E5, Squares.H2, Pieces.WHITE_BISHOP),
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
-    @unittest.expectedFailure
     def test_generate_queen_moves(self) -> None:
         board = Board()
         board.board[4][4] = Pieces.WHITE_QUEEN
         moves = board.generate_piece_moves(4, 4)
         expected_moves = [
             # Rook-like moves
-            ((4, 4), (4, 5)),
-            ((4, 4), (4, 6)),
-            ((4, 4), (4, 7)),
-            ((4, 4), (4, 3)),
-            ((4, 4), (4, 2)),
-            ((4, 4), (4, 1)),
-            ((4, 4), (4, 0)),
-            ((4, 4), (5, 4)),
-            ((4, 4), (6, 4)),
-            ((4, 4), (7, 4)),
-            ((4, 4), (3, 4)),
-            ((4, 4), (2, 4)),
-            ((4, 4), (1, 4)),
-            ((4, 4), (0, 4)),
+            Move(Squares.E5, Squares.A5, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.B5, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.C5, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.D5, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.F5, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.G5, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.H5, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.E1, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.E2, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.E3, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.E4, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.E6, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.E7, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.E8, Pieces.WHITE_QUEEN),
             # Bishop-like moves
-            ((4, 4), (5, 5)),
-            ((4, 4), (6, 6)),
-            ((4, 4), (7, 7)),
-            ((4, 4), (3, 3)),
-            ((4, 4), (2, 2)),
-            ((4, 4), (1, 1)),
-            ((4, 4), (0, 0)),
-            ((4, 4), (5, 3)),
-            ((4, 4), (6, 2)),
-            ((4, 4), (7, 1)),
-            ((4, 4), (3, 5)),
-            ((4, 4), (2, 6)),
-            ((4, 4), (1, 7)),
+            Move(Squares.E5, Squares.A1, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.B2, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.C3, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.D4, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.F6, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.G7, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.H8, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.B8, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.C7, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.D6, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.F4, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.G3, Pieces.WHITE_QUEEN),
+            Move(Squares.E5, Squares.H2, Pieces.WHITE_QUEEN),
         ]
         self.assertSetEqual(set(moves), set(expected_moves))
 
