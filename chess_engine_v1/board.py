@@ -34,10 +34,13 @@ BOARD_SIZE = 8
 
 
 class Board:
-    def __init__(self, fen_str: str):
+    def __init__(self, fen_str: str | None = None):
         # Initialize the board using FEN notation
-        fen_record = fen.FENRecord(fen_str)
-        self.board = fen_record.board()
+        if fen_str:
+            fen_record = fen.FENRecord(fen_str)
+            self.board = fen_record.board()
+        else:
+            self.board = [["."] * int(BOARD_SIZE) for _ in range(BOARD_SIZE)]
         self.turn = Player.WHITE
 
     def display(self) -> None:
