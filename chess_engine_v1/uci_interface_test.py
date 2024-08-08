@@ -2,9 +2,8 @@ import unittest
 from io import StringIO
 from unittest.mock import patch
 
+import fen
 from chess_engine import UCIInterface
-
-STARTING_GAME_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 
 class TestUCIInterface(unittest.TestCase):
@@ -15,7 +14,7 @@ class TestUCIInterface(unittest.TestCase):
                 [
                     "uci",
                     "isready",
-                    f"position fen {STARTING_GAME_FEN}",
+                    f"position fen {fen.STARTING_GAME_FEN}",
                     "go depth 1",
                     "d",
                     "quit",
