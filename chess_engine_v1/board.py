@@ -59,6 +59,8 @@ class Board:
         ]
         print("Legal moves:\n" + " ".join(legal_moves_as_algo))
 
+    # TODO: These two functions might not work as expected when called on squares
+    # without a piece.
     def _piece_owned_by_current_player(self, piece: str) -> bool:
         return piece.isupper() if self.turn == Player.WHITE else piece.islower()
 
@@ -161,13 +163,13 @@ class Board:
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
             while self._on_board(nr, nc):
-                if self.board[nr][
-                    nc
-                ] == "." or self._piece_capturable_by_current_player(
-                    self.board[nr][nc]
-                ):
+                if self.board[nr][nc] == ".":
+                    moves.append(self._create_move(r, c, nr, nc))
+                elif self._piece_capturable_by_current_player(self.board[nr][nc]):
+                    # If we can capture a piece on this square, we can't go further.
                     moves.append(self._create_move(r, c, nr, nc))
                     break
+
                 nr += dr
                 nc += dc
         return moves
