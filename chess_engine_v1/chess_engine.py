@@ -1,5 +1,7 @@
 import enum
 
+import board
+import fen
 from move import Move
 from square import Squares
 
@@ -24,71 +26,17 @@ class Pieces(enum.StrEnum):
     BLACK_PAWN = "p"
 
 
-BOARD_SIZE = 8
-
 DIAGONAL_DIRECTIONS = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
 VERTICAL_AND_HORIZONTAL_DIRECTIONS = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 ALL_DIRECTIONS = VERTICAL_AND_HORIZONTAL_DIRECTIONS + DIAGONAL_DIRECTIONS
 KNIGHT_MOVES = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
 
 
-class FENRecord:
-    # TODO: Add tests for FENRecord.
-
-    """You can learn more about the FEN Record format at https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation"""
-
-    def __init__(self, fen_str: str):
-        fen_parts = fen_str.split(" ")
-        self.board_str = fen_parts[0]
-
-        # TODO: ChatGPT: Handle rest of FEN string.
-
-    def board(self) -> list[list[str]]:
-        def valid_board_character(character: str) -> bool:
-            return character in [
-                "k",
-                "K",
-                "Q",
-                "q",
-                "B",
-                "b",
-                "N",
-                "n",
-                "R",
-                "r",
-                "P",
-                "p",
-            ]
-
-        board = []
-        rows = self.board_str.split("/")
-        # Store the rows in reversed order because FEN start with row 8 and works down
-        # to row 1.
-        for row in reversed(rows):
-            board_row = []
-            for char in row:
-                if char.isdigit():
-                    board_row.extend(["."] * int(char))
-                else:
-                    if valid_board_character:  # type: ignore
-                        board_row.append(char)
-                    else:
-                        raise Exception(f"Invalid chracter in FEN board, {char}")
-
-            if len(board_row) != BOARD_SIZE:
-                raise Exception(
-                    f"FEN record error, found row of size {len(board_row)}, "
-                    f"expecting {BOARD_SIZE}"
-                )
-            board.append(board_row)
-        return board
-
-
 class Board:
     def __init__(self, fen_str: str):
         # Initialize the board using FEN notation
-        fen = FENRecord(fen_str)
-        self.board = fen.board()
+        fen_record = fen.FENRecord(fen_str)
+        self.board = fen_record.board()
         self.turn = Player.WHITE
 
     def display(self) -> None:
@@ -128,8 +76,8 @@ class Board:
     def generate_moves(self) -> list[Move]:
         # Generate all legal moves for the current player
         moves = []
-        for r in range(BOARD_SIZE):
-            for c in range(BOARD_SIZE):
+        for r in range(board.BOARD_SIZE):
+            for c in range(board.BOARD_SIZE):
                 piece = self.board[r][c]
                 if self._piece_owned_by_current_player(piece):
                     moves.extend(self.generate_piece_moves(r, c))
@@ -174,7 +122,7 @@ class Board:
             new_r = r + direction
             new_c = c + dc
             if (
-                0 <= new_c < BOARD_SIZE
+                0 <= new_c < board.BOARD_SIZE
                 and self.board[new_r][new_c] != "."
                 and self._piece_capturable_by_current_player(self.board[new_r][new_c])
             ):
@@ -197,7 +145,7 @@ class Board:
         return self.generate_sliding_moves(r, c, ALL_DIRECTIONS)
 
     def _on_board(self, r: int, c: int) -> bool:
-        return 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE
+        return 0 <= r < board.BOARD_SIZE and 0 <= c < board.BOARD_SIZE
 
     def generate_sliding_moves(
         self, r: int, c: int, directions: list[tuple[int, int]]
@@ -382,14 +330,11 @@ class UCIInterface:
                     self.isready()
                 elif command.startswith("position startpos"):
                     # TODO: ChatGPT: handles moves passed in with this command.
-                    start_pos_fen = (
-                        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-                    )
-                    self.position(start_pos_fen)
+                    self.position(fen.STARTING_GAME_FEN)
                 elif command.startswith("position fen"):
                     # TODO: ChatGPT: handles moves passed in with this command.
-                    fen = command.split("position fen ")[1]
-                    self.position(fen)
+                    fen_str = command.split("position fen ")[1]
+                    self.position(fen_str)
                 elif command.startswith("go depth"):
                     depth = int(command.split("go depth ")[1])
                     self.go(depth)

@@ -1,5 +1,6 @@
 import unittest
 
+import fen
 from chess_engine import Board, ChessEngine, Pieces, uci_algebraic_notation
 from move import Move
 from square import Squares
@@ -10,8 +11,7 @@ from square import Squares
 class TestChessEngine(unittest.TestCase):
     def setUp(self) -> None:
         # Initialize the board and engine with a starting position
-        self.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        self.board = Board(self.fen)
+        self.board = Board(fen.STARTING_GAME_FEN)
         self.engine = ChessEngine(self.board)
 
     def test_parse_fen(self) -> None:
@@ -200,8 +200,8 @@ class TestChessEngine(unittest.TestCase):
     def test_best_move(self) -> None:
         # White has 2 pawn that can't move and a king in the corner that can only move
         # to one square. So there is only one move white can make.
-        fen = "8/8/8/8/7k/6pp/6PP/7K w - - 0 1"  # noqa
-        board = Board(self.fen)  # noqa
+        fen_str = "8/8/8/8/7k/6pp/6PP/7K w - - 0 1"
+        board = Board(fen_str)  # noqa
         engine = ChessEngine(self.board)  # noqa
 
         # Test the best move function
